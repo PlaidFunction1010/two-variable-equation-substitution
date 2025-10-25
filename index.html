@@ -3,20 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>代入消去法第二型｜二元一次聯立方程式練習</title>
+  <title>聯立方程式練習｜代入消去法</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Noto Sans TC", "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
     }
+
     body {
       background-color: #0f172a;
       color: #f8fafc;
-      display: flex;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+
+    /* 整個中間主要區域（側欄 + 主畫面），footer 以外 */
+    .app-shell {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    /* ====== Sidebar ====== */
     .sidebar {
       width: 240px;
       background: radial-gradient(circle at 20% 20%, #1e293b 0%, #0f172a 60%);
@@ -30,6 +42,7 @@
       font-size: 1rem;
       font-weight: 600;
       color: #38bdf8;
+      letter-spacing: 0.03em;
     }
     .nav-section-title {
       font-size: 0.8rem;
@@ -40,14 +53,20 @@
       margin-top: 10px;
     }
     .nav-card {
-      background: linear-gradient(145deg, rgba(30,41,59,0.8) 0%, rgba(15,23,42,0.4) 100%);
+      background: linear-gradient(
+        145deg,
+        rgba(30,41,59,0.8) 0%,
+        rgba(15,23,42,0.4) 100%
+      );
       border: 1px solid rgba(148,163,184,0.2);
       border-radius: 14px;
       padding: 16px;
       cursor: pointer;
       transition: all 0.15s ease;
+      margin-bottom: 8px;
     }
-    .nav-card:hover, .nav-card.active {
+    .nav-card.active,
+    .nav-card:hover {
       border-color: #38bdf8;
       box-shadow: 0 10px 30px rgba(56,189,248,0.3);
     }
@@ -56,40 +75,117 @@
       font-weight: 600;
       color: #f8fafc;
       margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .nav-card-desc {
       font-size: 0.8rem;
       color: #94a3b8;
       line-height: 1.4;
     }
+
+    /* ====== Main area ====== */
     .main {
       flex: 1;
       padding: 24px clamp(16px,2vw,32px);
       display: flex;
       flex-direction: column;
       gap: 24px;
+      overflow-y: auto;
+
+      /* 預設字級：中 */
+      font-size: 24pt;
+      line-height: 1.4;
     }
+
+    /* 三種字體大小模式 */
+    .font-small {
+      font-size: 16pt;
+      line-height: 1.4;
+    }
+    .font-medium {
+      font-size: 24pt;
+      line-height: 1.4;
+    }
+    .font-large {
+      font-size: 32pt;
+      line-height: 1.4;
+    }
+
+    /* 讓 main 裡的標題、按鈕、輸入等也跟著放大，用相對單位 */
+    .main h1,
+    .main h2,
+    .main .badge,
+    .main .subtext,
+    .main .hint,
+    .main button,
+    .main label,
+    .main input,
+    .main .feedback,
+    .main .solution-toggle-btn,
+    .main .solution-box,
+    .main .equations-box {
+      font-size: 1em;
+    }
+
+    /* 字體大小控制列 */
+    .fontsize-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .fontsize-label {
+      font-size: 0.6em;
+      color: #94a3b8;
+    }
+    .size-btn {
+      appearance: none;
+      border: 1px solid rgba(148,163,184,0.3);
+      background: linear-gradient(
+        145deg,
+        rgba(30,41,59,0.8) 0%,
+        rgba(15,23,42,0.4) 100%
+      );
+      color: #f8fafc;
+      font-size: 0.6em;
+      font-weight: 500;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: all 0.15s ease;
+    }
+    .size-btn:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 10px 30px rgba(56,189,248,0.3);
+      color: #38bdf8;
+    }
+
+    /* ===== Header text in each mode ===== */
     .header-text h1 {
-      font-size: 1.1rem;
       font-weight: 600;
       color: #f8fafc;
       display: flex;
-      align-items: baseline;
+      flex-wrap: wrap;
       gap: .5rem;
+      align-items: baseline;
     }
     .badge {
       background: rgba(56,189,248,0.15);
       border: 1px solid rgba(56,189,248,0.6);
       color: #38bdf8;
-      font-size: 0.7rem;
-      border-radius: 999px;
+      font-weight: 500;
       padding: 2px 8px;
+      border-radius: 999px;
     }
     .subtext {
-      font-size: 0.8rem;
       color: #94a3b8;
       margin-top: 4px;
     }
+
+    /* ===== Cards, inputs, etc. ===== */
     .card {
       background: radial-gradient(circle at 20% 20%, #1e253a 0%, #0f172a 60%);
       border: 1px solid rgba(148,163,184,0.2);
@@ -97,183 +193,692 @@
       padding: 20px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     }
-    button {
-      background: linear-gradient(145deg, rgba(30,41,59,0.8), rgba(15,23,42,0.4));
-      border: 1px solid rgba(148,163,184,0.3);
-      color: #f8fafc;
-      border-radius: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-size: 0.8rem;
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
     }
-    button:hover {
+    .card-header-left h2 {
+      font-weight: 600;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hint {
+      color: #94a3b8;
+      white-space: pre-line;
+      margin-top: 4px;
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    button.action-btn {
+      appearance: none;
+      border: 1px solid rgba(148,163,184,0.3);
+      background: linear-gradient(
+        145deg,
+        rgba(30,41,59,0.8) 0%,
+        rgba(15,23,42,0.4) 100%
+      );
+      color: #f8fafc;
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      line-height: 1.2;
+      min-width: 90px;
+      transition: all 0.15s ease;
+      font-size: 0.6em;
+    }
+    button.action-btn:hover {
       border-color: #38bdf8;
-      box-shadow: 0 0 10px rgba(56,189,248,0.3);
+      box-shadow: 0 10px 30px rgba(56,189,248,0.3);
       color: #38bdf8;
     }
+
     .equations-box {
       background: rgba(15,23,42,0.6);
       border: 1px solid rgba(148,163,184,0.2);
       border-radius: 12px;
       padding: 16px;
-      font-size: 1rem;
-      margin-bottom: 12px;
+      line-height: 1.6;
+      color: #f8fafc;
+      min-height: 70px;
       white-space: pre-line;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 16px;
     }
-    .feedback { font-size: 0.9rem; font-weight: 600; min-height: 1.2em; }
+
+    .inputs-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 16px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 100px;
+    }
+    .input-group label {
+      color: #94a3b8;
+      font-size: 0.6em;
+    }
+    .input-group input {
+      background: rgba(15,23,42,0.6);
+      border: 1px solid rgba(148,163,184,0.4);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #f8fafc;
+      min-width: 80px;
+      font-size: 0.6em;
+    }
+    .input-group input:focus {
+      outline: 2px solid #38bdf8;
+      outline-offset: 0;
+      border-color: #38bdf8;
+      box-shadow: 0 0 20px rgba(56,189,248,0.5);
+    }
+
+    .feedback {
+      font-weight: 600;
+      min-height: 1.2em;
+      font-size: 0.7em;
+    }
     .correct { color: #4ade80; }
     .wrong { color: #f87171; }
+
+    .solution-wrapper {
+      border-top: 1px solid rgba(148,163,184,0.2);
+      padding-top: 16px;
+    }
+    .solution-toggle-btn {
+      color: #38bdf8;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+      font-size: 0.6em;
+    }
     .solution-box {
-      display: none;
+      margin-top: 10px;
       background: rgba(15,23,42,0.6);
       border: 1px solid rgba(148,163,184,0.2);
       border-radius: 10px;
       padding: 14px;
-      margin-top: 10px;
+      color: #f8fafc;
+      line-height: 1.5;
+      display: none;
       white-space: pre-line;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.6em;
+    }
+
+    /* ====== 模式切換區塊 Visibility ====== */
+    .mode-section { display: none; }
+    .mode-section.active { display: block; }
+
+    /* ====== Footer ====== */
+    .site-footer {
+      background-color: #0a1224;
+      border-top: 1px solid rgba(148,163,184,0.2);
+      color: #475569;
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 12px 16px;
+      line-height: 1.4;
+      user-select: none;
+    }
+
+    @media(max-width: 640px){
+      .sidebar { width: 200px; }
+    }
+    @media(max-width: 520px){
+      .app-shell {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(148,163,184,0.2);
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
     }
   </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="brand">鴻鈞數學練功房</div>
 
-    <div>
-      <div class="nav-section-title">代入消去法</div>
-      <div class="nav-card">
-        <div class="nav-card-title">第一型</div>
-        <div class="nav-card-desc">一條式子只有單變數</div>
-      </div>
-      <div class="nav-card active">
-        <div class="nav-card-title">第二型</div>
-        <div class="nav-card-desc">需整理成 y=ax+b 再代入</div>
-      </div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <div class="header-text">
-      <h1>代入消去法 <span class="badge">第二型</span></h1>
-      <div class="subtext">將方程式一整理成 y=ax+b 或 x=ay+b，再代入方程式二解出 (x,y)</div>
-    </div>
-
-    <section class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>題目區</h2>
-        <div>
-          <button id="newQ">出題</button>
-          <button id="checkAns">檢查答案</button>
-        </div>
-      </div>
-
-      <div class="equations-box" id="questionBox">請按「出題」</div>
+  <div class="app-shell">
+    <!-- ====== 左側側欄 ====== -->
+    <aside class="sidebar">
+      <div class="brand">鴻鈞數學練功房</div>
 
       <div>
-        <label>x = </label><input type="number" id="ansX" />
-        <label style="margin-left:10px;">y = </label><input type="number" id="ansY" />
-        <button style="margin-left:10px;" id="clearBtn">清除</button>
+        <div class="nav-section-title">代入消去法</div>
+
+        <div class="nav-card active" id="nav-type1">
+          <div class="nav-card-title">
+            <span>第一型</span>
+            <span style="font-size:0.7rem; color:#38bdf8;">Lv.1</span>
+          </div>
+          <div class="nav-card-desc">
+            一條式子只有單一變數<br/>直接代入另一條
+          </div>
+        </div>
+
+        <div class="nav-card" id="nav-type2">
+          <div class="nav-card-title">
+            <span>第二型</span>
+            <span style="font-size:0.7rem; color:#38bdf8;">Lv.2</span>
+          </div>
+          <div class="nav-card-desc">
+            先把式(1) 整理成 y=ax+b<br/>再代入式(2)
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====== 右側主畫面 ====== -->
+    <main class="main font-medium" id="mainArea">
+      <!-- 字體大小控制列 -->
+      <div class="fontsize-bar">
+        <div class="fontsize-label">字體大小：</div>
+        <button class="size-btn" id="sizeSmall">小(16pt)</button>
+        <button class="size-btn" id="sizeMedium">中(24pt)</button>
+        <button class="size-btn" id="sizeLarge">大(32pt)</button>
       </div>
 
-      <div id="feedback" class="feedback"></div>
+      <!-- ========= 第一型的畫面區塊 ========= -->
+      <section class="mode-section active" id="mode-type1">
+        <div class="header-text">
+          <h1>
+            聯立方程式練習區
+            <span class="badge">代入消去法｜第一型</span>
+          </h1>
+          <div class="subtext">
+            步驟：用「只有一個變數」的那條式子先拿到 x 或 y，代入另一條式子，再解出 (x, y)
+          </div>
+        </div>
 
-      <div style="margin-top:10px; cursor:pointer; color:#38bdf8;" id="toggleDetail">▶ 顯示/隱藏詳解</div>
-      <div id="solutionBox" class="solution-box"></div>
-    </section>
-  </main>
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2>題目 / Question</h2>
+              <div class="hint">
+                例如：
+                式(1)：x = 3
+                式(2)：2x + y = 9
+                正解：(x, y) = (3, 3)
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="action-btn" id="btn-new-1">出題</button>
+              <button class="action-btn" id="btn-check-1">檢查答案</button>
+              <button class="action-btn" id="btn-clear-1">清除輸入</button>
+            </div>
+          </div>
+
+          <div class="equations-box" id="equationsBox-1">
+            請按「出題」
+          </div>
+
+          <div class="inputs-row">
+            <div class="input-group">
+              <label for="ansX-1">你的答案 x =</label>
+              <input id="ansX-1" type="number" />
+            </div>
+
+            <div class="input-group">
+              <label for="ansY-1">你的答案 y =</label>
+              <input id="ansY-1" type="number" />
+            </div>
+          </div>
+
+          <div class="feedback" id="feedback-1"></div>
+
+          <div class="solution-wrapper">
+            <div class="solution-toggle-btn" id="toggle-solution-1">
+              <span id="toggle-icon-1">▶</span>
+              <span>顯示 / 隱藏 詳解</span>
+            </div>
+            <div class="solution-box" id="solutionBox-1">
+              （詳解會出現在這裡）
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ========= 第二型的畫面區塊 ========= -->
+      <section class="mode-section" id="mode-type2">
+        <div class="header-text">
+          <h1>
+            聯立方程式練習區
+            <span class="badge">代入消去法｜第二型</span>
+          </h1>
+          <div class="subtext">
+            將式(1) 變成 y = ax + b（或 x = ay + b），再代入式(2) 解出 (x,y)
+          </div>
+        </div>
+
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2>題目 / Question</h2>
+              <div class="hint">
+                範例：
+                式(1)：2x - y = 3
+                式(2)：2x + y = 9
+                正解：(x, y) = (3, 3)
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="action-btn" id="btn-new-2">出題</button>
+              <button class="action-btn" id="btn-check-2">檢查答案</button>
+              <button class="action-btn" id="btn-clear-2">清除輸入</button>
+            </div>
+          </div>
+
+          <div class="equations-box" id="equationsBox-2">
+            請按「出題」
+          </div>
+
+          <div class="inputs-row">
+            <div class="input-group">
+              <label for="ansX-2">你的答案 x =</label>
+              <input id="ansX-2" type="number" />
+            </div>
+
+            <div class="input-group">
+              <label for="ansY-2">你的答案 y =</label>
+              <input id="ansY-2" type="number" />
+            </div>
+          </div>
+
+          <div class="feedback" id="feedback-2"></div>
+
+          <div class="solution-wrapper">
+            <div class="solution-toggle-btn" id="toggle-solution-2">
+              <span id="toggle-icon-2">▶</span>
+              <span>顯示 / 隱藏 詳解</span>
+            </div>
+            <div class="solution-box" id="solutionBox-2">
+              （詳解會出現在這裡）
+            </div>
+          </div>
+        </section>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ====== 頁尾版權宣告 ====== -->
+  <footer class="site-footer">
+    本頁內容僅供教學練習使用。版權所有 © 鴻鈞數學練功房
+  </footer>
 
   <script>
-    let curX = 0, curY = 0, eq1 = "", eq2 = "", sol = "";
+    // ===========================
+    // 字級控制
+    // ===========================
+    const mainArea = document.getElementById("mainArea");
+    const sizeSmallBtn = document.getElementById("sizeSmall");
+    const sizeMediumBtn = document.getElementById("sizeMedium");
+    const sizeLargeBtn = document.getElementById("sizeLarge");
 
-    function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+    function setFontSize(modeClass){
+      mainArea.classList.remove("font-small","font-medium","font-large");
+      mainArea.classList.add(modeClass);
+    }
 
-    function genProblem(){
-      // 1. 隨機整數解
-      curX = randInt(-5,5);
-      curY = randInt(-5,5);
-      if(curX===0 && curY===0){curX=2;curY=-1;}
+    sizeSmallBtn.addEventListener("click", ()=>setFontSize("font-small"));
+    sizeMediumBtn.addEventListener("click", ()=>setFontSize("font-medium"));
+    sizeLargeBtn.addEventListener("click", ()=>setFontSize("font-large"));
 
-      // 2. 隨機方程式1: ax + by = c
-      let a1=0,b1=0;
-      while(a1===0 && b1===0){a1=randInt(-5,5); b1=randInt(-5,5);}
-      const c1 = a1*curX + b1*curY;
+    // ===========================
+    // 工具：隨機整數
+    // ===========================
+    function randInt(min, max){
+      return Math.floor(Math.random()*(max-min+1))+min;
+    }
 
-      // 3. 方程式2: a2x + b2y = c2
-      let a2=0,b2=0;
-      while(a2===0 && b2===0){a2=randInt(-5,5); b2=randInt(-5,5);}
-      const c2 = a2*curX + b2*curY;
+    // ===========================
+    // 模式切換 (左側點卡片)
+    // ===========================
+    const nav1 = document.getElementById("nav-type1");
+    const nav2 = document.getElementById("nav-type2");
+    const mode1 = document.getElementById("mode-type1");
+    const mode2 = document.getElementById("mode-type2");
 
-      function term(coeff,varName){
-        if(coeff===0)return "";
-        if(coeff===1)return varName;
-        if(coeff===-1)return "-"+varName;
-        return coeff+varName;
+    function activateMode(mode){
+      if(mode === "type1"){
+        nav1.classList.add("active");
+        nav2.classList.remove("active");
+        mode1.classList.add("active");
+        mode2.classList.remove("active");
+      } else {
+        nav2.classList.add("active");
+        nav1.classList.remove("active");
+        mode2.classList.add("active");
+        mode1.classList.remove("active");
       }
-      function joinTerm(a,b){
-        if(a && b){
-          if(b[0]==='-') return a+" "+b;
-          else return a+" + "+b;
+    }
+
+    nav1.addEventListener("click", ()=>{
+      activateMode("type1");
+    });
+    nav2.addEventListener("click", ()=>{
+      activateMode("type2");
+    });
+
+    // ===========================
+    // 第一型邏輯
+    // ===========================
+    let curX1 = null;
+    let curY1 = null;
+
+    function generateProblemType1(){
+      let xVal = randInt(-5,5);
+      let yVal = randInt(-5,5);
+      if(xVal===0 && yVal===0){ xVal = 2; yVal = -3; }
+
+      const singleIsX = Math.random() < 0.5;
+
+      let a = 0, b = 0;
+      while(a===0 && b===0){
+        a = randInt(-5,5);
+        b = randInt(-5,5);
+      }
+      const c = a*xVal + b*yVal;
+
+      function termToText(coeff, variable){
+        if(coeff === 0) return "";
+        if(coeff === 1) return variable;
+        if(coeff === -1) return "-" + variable;
+        return coeff + variable;
+      }
+      function joinTerms(ax, by){
+        if(ax && by){
+          if(by.startsWith("-")){
+            return ax + " " + by;
+          } else {
+            return ax + " + " + by;
+          }
         }
-        return a||b;
+        return ax || by;
       }
 
-      const left1 = joinTerm(term(a1,"x"),term(b1,"y"));
-      const left2 = joinTerm(term(a2,"x"),term(b2,"y"));
-      eq1 = `式(1)：${left1} = ${c1}`;
-      eq2 = `式(2)：${left2} = ${c2}`;
+      const leftSide = joinTerms(
+        termToText(a,"x"),
+        termToText(b,"y")
+      );
 
-      // 4. 產生詳解
-      let solSteps="";
-      if(b1!==0){
+      const eq1Text = singleIsX
+        ? `式(1)：x = ${xVal}`
+        : `式(1)：y = ${yVal}`;
+      const eq2Text = `式(2)：${leftSide} = ${c}`;
+
+      let explanation = "";
+      if(singleIsX){
+        if(b !== 0){
+          const isolateYNum = c - a*xVal;
+          explanation =
+`1. 由式(1)得 x = ${xVal}
+2. 將 x=${xVal} 代入式(2):
+   ${leftSide.replace("x","("+xVal+")")} = ${c}
+   ⇒ ${a}·(${xVal}) + ${b}·y = ${c}
+   ⇒ ${b}·y = ${isolateYNum}
+   ⇒ y = ${isolateYNum} ÷ ${b} = ${yVal}
+3. 所以 (x,y)=(${xVal},${yVal})`;
+        } else {
+          explanation =
+`1. 由式(1)得 x = ${xVal}
+2. 式(2) 幾乎只限制 x，可檢查 x=${xVal} 是否滿足
+3. y 對應為 ${yVal}
+4. (x,y)=(${xVal},${yVal})`;
+        }
+      } else {
+        if(a !== 0){
+          const isolateXNum = c - b*yVal;
+          explanation =
+`1. 由式(1)得 y = ${yVal}
+2. 將 y=${yVal} 代入式(2):
+   ${leftSide.replace("y","("+yVal+")")} = ${c}
+   ⇒ ${a}·x + ${b}·(${yVal}) = ${c}
+   ⇒ ${a}·x = ${isolateXNum}
+   ⇒ x = ${isolateXNum} ÷ ${a} = ${xVal}
+3. 所以 (x,y)=(${xVal},${yVal})`;
+        } else {
+          explanation =
+`1. 由式(1)得 y = ${yVal}
+2. 式(2) 幾乎只限制 y，可檢查 y=${yVal} 是否滿足
+3. x 對應為 ${xVal}
+4. (x,y)=(${xVal},${yVal})`;
+        }
+      }
+
+      document.getElementById("equationsBox-1").textContent = eq1Text + "\n" + eq2Text;
+      document.getElementById("solutionBox-1").textContent = explanation;
+      document.getElementById("solutionBox-1").style.display = "none";
+      document.getElementById("toggle-icon-1").textContent = "▶";
+
+      document.getElementById("feedback-1").textContent = "";
+      document.getElementById("feedback-1").className = "feedback";
+
+      document.getElementById("ansX-1").value = "";
+      document.getElementById("ansY-1").value = "";
+
+      curX1 = xVal;
+      curY1 = yVal;
+    }
+
+    function checkAnswerType1(){
+      const xInput = document.getElementById("ansX-1").value;
+      const yInput = document.getElementById("ansY-1").value;
+      const fb = document.getElementById("feedback-1");
+
+      if(xInput === "" || yInput === ""){
+        fb.textContent = "請先填好 x 和 y 再檢查";
+        fb.className = "feedback wrong";
+        return;
+      }
+
+      const ux = Number(xInput);
+      const uy = Number(yInput);
+
+      if(ux === curX1 && uy === curY1){
+        fb.textContent = `✅ 正確！(x, y) = (${curX1}, ${curY1})`;
+        fb.className = "feedback correct";
+      } else {
+        fb.textContent = "❌ 還沒對喔，請再試一次";
+        fb.className = "feedback wrong";
+      }
+    }
+
+    // ===========================
+    // 第二型邏輯
+    // ===========================
+    let curX2 = null;
+    let curY2 = null;
+
+    function generateProblemType2(){
+      let xVal = randInt(-5,5);
+      let yVal = randInt(-5,5);
+      if(xVal===0 && yVal===0){ xVal=2; yVal=-1; }
+
+      let a1=0,b1=0;
+      while(a1===0 && b1===0){
+        a1 = randInt(-5,5);
+        b1 = randInt(-5,5);
+      }
+      const c1 = a1*xVal + b1*yVal;
+
+      let a2=0,b2=0;
+      while(a2===0 && b2===0){
+        a2 = randInt(-5,5);
+        b2 = randInt(-5,5);
+      }
+      const c2 = a2*xVal + b2*yVal;
+
+      function term(coeff, v){
+        if(coeff===0) return "";
+        if(coeff===1) return v;
+        if(coeff===-1) return "-" + v;
+        return coeff + v;
+      }
+      function joinTerm(ax,by){
+        if(ax && by){
+          if(by[0]==='-') return ax+" "+by;
+          return ax+" + "+by;
+        }
+        return ax||by;
+      }
+
+      const left1 = joinTerm(term(a1,"x"), term(b1,"y"));
+      const left2 = joinTerm(term(a2,"x"), term(b2,"y"));
+
+      const eq1Text = `式(1)：${left1} = ${c1}`;
+      const eq2Text = `式(2)：${left2} = ${c2}`;
+
+      let explanation = "";
+      if(b1 !== 0){
         const step1 = `由式(1)：${a1}x + ${b1}y = ${c1}`;
         const step2 = `整理為 y = (${c1} - ${a1}x) ÷ ${b1}`;
         const step3 = `代入式(2)：${a2}x + ${b2}·[(${c1}-${a1}x)/${b1}] = ${c2}`;
-        const step4 = `展開後得 ${(a2*b1 - b2*a1)}x = ${c2*b1 - b2*c1}`;
-        const step5 = `x = (${c2*b1 - b2*c1}) ÷ (${a2*b1 - b2*a1}) = ${curX}`;
-        const step6 = `代回 y = (${c1} - ${a1}×${curX}) ÷ ${b1} = ${curY}`;
-        solSteps = [step1,step2,step3,step4,step5,step6,`答案：(x,y)=(${curX},${curY})`].join("\n");
-      }else if(a1!==0){
+        const A = a2*b1 - b2*a1;
+        const B = c2*b1 - b2*c1;
+        const step4 = `整理後得到 ${A}x = ${B}`;
+        const step5 = `x = ${B} ÷ ${A} = ${xVal}`;
+        const step6 = `代回 y = (${c1} - ${a1}×${xVal}) ÷ ${b1} = ${yVal}`;
+        explanation = [
+          step1, step2, step3, step4, step5, step6,
+          `答案：(x, y) = (${xVal}, ${yVal})`
+        ].join("\n");
+      } else if(a1 !== 0){
         const step1 = `由式(1)：${a1}x + ${b1}y = ${c1}`;
         const step2 = `整理為 x = (${c1} - ${b1}y) ÷ ${a1}`;
         const step3 = `代入式(2)：${a2}·[(${c1}-${b1}y)/${a1}] + ${b2}y = ${c2}`;
-        const step4 = `展開後得 ${(a1*b2 - a2*b1)}y = ${a1*c2 - a2*c1}`;
-        const step5 = `y = (${a1*c2 - a2*c1}) ÷ (${a1*b2 - a2*b1}) = ${curY}`;
-        const step6 = `代回 x = (${c1} - ${b1}×${curY}) ÷ ${a1} = ${curX}`;
-        solSteps = [step1,step2,step3,step4,step5,step6,`答案：(x,y)=(${curX},${curY})`].join("\n");
+        const A = a1*b2 - a2*b1;
+        const B = a1*c2 - a2*c1;
+        const step4 = `整理後得到 ${A}y = ${B}`;
+        const step5 = `y = ${B} ÷ ${A} = ${yVal}`;
+        const step6 = `代回 x = (${c1} - ${b1}×${yVal}) ÷ ${a1} = ${xVal}`;
+        explanation = [
+          step1, step2, step3, step4, step5, step6,
+          `答案：(x, y) = (${xVal}, ${yVal})`
+        ].join("\n");
+      } else {
+        explanation = "（理論上不會發生：式(1) 無法整理）";
       }
-      sol = solSteps;
 
-      document.getElementById("questionBox").textContent = eq1 + "\n" + eq2;
-      document.getElementById("solutionBox").textContent = sol;
-      document.getElementById("solutionBox").style.display="none";
-      document.getElementById("feedback").textContent="";
+      document.getElementById("equationsBox-2").textContent = eq1Text + "\n" + eq2Text;
+      document.getElementById("solutionBox-2").textContent = explanation;
+      document.getElementById("solutionBox-2").style.display = "none";
+      document.getElementById("toggle-icon-2").textContent = "▶";
+
+      document.getElementById("feedback-2").textContent = "";
+      document.getElementById("feedback-2").className = "feedback";
+
+      document.getElementById("ansX-2").value = "";
+      document.getElementById("ansY-2").value = "";
+
+      curX2 = xVal;
+      curY2 = yVal;
     }
 
-    function checkAns(){
-      const x = Number(document.getElementById("ansX").value);
-      const y = Number(document.getElementById("ansY").value);
-      const fb = document.getElementById("feedback");
-      if(x===curX && y===curY){
-        fb.textContent = `✅ 正確！(x,y)=(${curX},${curY})`;
-        fb.className="feedback correct";
-      }else{
-        fb.textContent = `❌ 再試試看喔～`;
-        fb.className="feedback wrong";
+    function checkAnswerType2(){
+      const xInput = document.getElementById("ansX-2").value;
+      const yInput = document.getElementById("ansY-2").value;
+      const fb = document.getElementById("feedback-2");
+
+      if(xInput === "" || yInput === ""){
+        fb.textContent = "請先填好 x 和 y 再檢查";
+        fb.className = "feedback wrong";
+        return;
+      }
+
+      const ux = Number(xInput);
+      const uy = Number(yInput);
+
+      if(ux === curX2 && uy === curY2){
+        fb.textContent = `✅ 正確！(x, y) = (${curX2}, ${curY2})`;
+        fb.className = "feedback correct";
+      } else {
+        fb.textContent = "❌ 還沒對喔，請再試一次";
+        fb.className = "feedback wrong";
       }
     }
 
-    document.getElementById("newQ").onclick = genProblem;
-    document.getElementById("checkAns").onclick = checkAns;
-    document.getElementById("clearBtn").onclick = ()=>{
-      document.getElementById("ansX").value="";
-      document.getElementById("ansY").value="";
-      document.getElementById("feedback").textContent="";
-    };
-    document.getElementById("toggleDetail").onclick = ()=>{
-      const box=document.getElementById("solutionBox");
-      box.style.display=(box.style.display==="none")?"block":"none";
-    };
-    genProblem();
+    // ===========================
+    // 詳解展開/收合
+    // ===========================
+    document.getElementById("toggle-solution-1").addEventListener("click", ()=>{
+      const box = document.getElementById("solutionBox-1");
+      const icon = document.getElementById("toggle-icon-1");
+      if(box.style.display === "none"){
+        box.style.display = "block";
+        icon.textContent = "▼";
+      } else {
+        box.style.display = "none";
+        icon.textContent = "▶";
+      }
+    });
+
+    document.getElementById("toggle-solution-2").addEventListener("click", ()=>{
+      const box = document.getElementById("solutionBox-2");
+      const icon = document.getElementById("toggle-icon-2");
+      if(box.style.display === "none"){
+        box.style.display = "block";
+        icon.textContent = "▼";
+      } else {
+        box.style.display = "none";
+        icon.textContent = "▶";
+      }
+    });
+
+    // ===========================
+    // 綁定按鈕 (第一型)
+    // ===========================
+    document.getElementById("btn-new-1").addEventListener("click", generateProblemType1);
+    document.getElementById("btn-check-1").addEventListener("click", checkAnswerType1);
+    document.getElementById("btn-clear-1").addEventListener("click", ()=>{
+      document.getElementById("ansX-1").value="";
+      document.getElementById("ansY-1").value="";
+      const fb = document.getElementById("feedback-1");
+      fb.textContent="";
+      fb.className="feedback";
+    });
+
+    // ===========================
+    // 綁定按鈕 (第二型)
+    // ===========================
+    document.getElementById("btn-new-2").addEventListener("click", generateProblemType2);
+    document.getElementById("btn-check-2").addEventListener("click", checkAnswerType2);
+    document.getElementById("btn-clear-2").addEventListener("click", ()=>{
+      document.getElementById("ansX-2").value="";
+      document.getElementById("ansY-2").value="";
+      const fb = document.getElementById("feedback-2");
+      fb.textContent="";
+      fb.className="feedback";
+    });
+
+    // ===========================
+    // 預設載入：第一型出題 + main用中尺寸
+    // ===========================
+    setFontSize("font-medium");
+    generateProblemType1();
   </script>
 </body>
 </html>
