@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>聯立方程式練習｜代入消去法</title>
+
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -94,8 +104,8 @@
       gap: 24px;
       overflow-y: auto;
 
-      /* 預設字級：中 */
-      font-size: 24pt;
+      /* 預設字級：小 (16pt) */
+      font-size: 16pt;
       line-height: 1.4;
     }
 
@@ -386,11 +396,21 @@
             先把式(1) 整理成 y=ax+b<br/>再代入式(2)
           </div>
         </div>
+
+        <div class="nav-card" id="nav-type3">
+          <div class="nav-card-title">
+            <span>第三型</span>
+            <span style="font-size:0.7rem; color:#38bdf8;">Lv.3</span>
+          </div>
+          <div class="nav-card-desc">
+            分母有未知數<br/>a/x + b/y = c
+          </div>
+        </div>
       </div>
     </aside>
 
     <!-- ====== 右側主畫面 ====== -->
-    <main class="main font-medium" id="mainArea">
+    <main class="main font-small" id="mainArea">
       <!-- 字體大小控制列 -->
       <div class="fontsize-bar">
         <div class="fontsize-label">字體大小：</div>
@@ -521,6 +541,68 @@
         </section>
       </section>
 
+      <!-- ========= 第三型的畫面區塊 ========= -->
+      <section class="mode-section" id="mode-type3">
+        <div class="header-text">
+          <h1>
+            聯立方程式練習區
+            <span class="badge">代入消去法｜第三型</span>
+          </h1>
+          <div class="subtext">
+            兩條方程式長得像 \( \frac{a}{x} + \frac{b}{y} = c \)。<br/>
+            設 \(U=\frac{1}{x}, V=\frac{1}{y}\)，先解 U 和 V，再回推 x 和 y。
+          </div>
+        </div>
+
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2>題目 / Question</h2>
+              <div class="hint">
+                範例：
+                式(1)：\( \frac{2}{x} + \frac{1}{y} = 3 \)
+                式(2)：\( \frac{1}{x} + \frac{2}{y} = 3 \)
+                正解：(x, y) = (1, 1)
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="action-btn" id="btn-new-3">出題</button>
+              <button class="action-btn" id="btn-check-3">檢查答案</button>
+              <button class="action-btn" id="btn-clear-3">清除輸入</button>
+            </div>
+          </div>
+
+          <div class="equations-box" id="equationsBox-3">
+            請按「出題」
+          </div>
+
+          <div class="inputs-row">
+            <div class="input-group">
+              <label for="ansX-3">你的答案 x =</label>
+              <input id="ansX-3" type="number" />
+            </div>
+
+            <div class="input-group">
+              <label for="ansY-3">你的答案 y =</label>
+              <input id="ansY-3" type="number" />
+            </div>
+          </div>
+
+          <div class="feedback" id="feedback-3"></div>
+
+          <div class="solution-wrapper">
+            <div class="solution-toggle-btn" id="toggle-solution-3">
+              <span id="toggle-icon-3">▶</span>
+              <span>顯示 / 隱藏 詳解</span>
+            </div>
+            <div class="solution-box" id="solutionBox-3">
+              （詳解會出現在這裡）
+            </div>
+          </div>
+        </section>
+      </section>
+
     </main>
   </div>
 
@@ -555,33 +637,47 @@
     }
 
     // ===========================
-    // 模式切換 (左側點卡片)
+    // 模式切換 (左邊點卡片)
     // ===========================
     const nav1 = document.getElementById("nav-type1");
     const nav2 = document.getElementById("nav-type2");
+    const nav3 = document.getElementById("nav-type3");
+
     const mode1 = document.getElementById("mode-type1");
     const mode2 = document.getElementById("mode-type2");
+    const mode3 = document.getElementById("mode-type3");
 
-    function activateMode(mode){
-      if(mode === "type1"){
+    function activateMode(which){
+      // sidebar active 樣式
+      nav1.classList.remove("active");
+      nav2.classList.remove("active");
+      nav3.classList.remove("active");
+
+      // main 區塊顯示/隱藏
+      mode1.classList.remove("active");
+      mode2.classList.remove("active");
+      mode3.classList.remove("active");
+
+      if(which==="type1"){
         nav1.classList.add("active");
-        nav2.classList.remove("active");
         mode1.classList.add("active");
-        mode2.classList.remove("active");
-      } else {
+      } else if(which==="type2"){
         nav2.classList.add("active");
-        nav1.classList.remove("active");
         mode2.classList.add("active");
-        mode1.classList.remove("active");
+      } else {
+        nav3.classList.add("active");
+        mode3.classList.add("active");
+      }
+
+      // 切換模式後，讓 MathJax 重新排版（以防使用者先出題後切頁又回來）
+      if(window.MathJax && window.MathJax.typeset){
+        window.MathJax.typeset();
       }
     }
 
-    nav1.addEventListener("click", ()=>{
-      activateMode("type1");
-    });
-    nav2.addEventListener("click", ()=>{
-      activateMode("type2");
-    });
+    nav1.addEventListener("click", ()=>{ activateMode("type1"); });
+    nav2.addEventListener("click", ()=>{ activateMode("type2"); });
+    nav3.addEventListener("click", ()=>{ activateMode("type3"); });
 
     // ===========================
     // 第一型邏輯
@@ -822,6 +918,161 @@
     }
 
     // ===========================
+    // 第三型邏輯 (a/x + b/y = c)
+    // ===========================
+    let curX3 = null;
+    let curY3 = null;
+
+    function generateProblemType3(){
+      // 1. 先隨機一組整數解 (xVal, yVal)，不能是0，因為當分母
+      let xVal = 0;
+      let yVal = 0;
+      while(xVal === 0){
+        xVal = randInt(-5,5);
+      }
+      while(yVal === 0){
+        yVal = randInt(-5,5);
+      }
+
+      // 我們必須找到 a,b,c,d,e,f
+      // 條件：
+      //  - a != 0, b != 0, c != 0
+      //  - d != 0, e != 0, f != 0
+      //  - c = a/xVal + b/yVal 是整數
+      //  - f = d/xVal + e/yVal 是整數
+      let a, b, d, e;
+      let cInt = null;
+      let fInt = null;
+      let safetyCount = 0;
+
+      function nonZeroRand(){
+        let v = 0;
+        while(v===0){
+          v = randInt(-5,5);
+        }
+        return v;
+      }
+
+      while(true){
+        safetyCount++;
+
+        a = nonZeroRand();
+        b = nonZeroRand();
+        d = nonZeroRand();
+        e = nonZeroRand();
+
+        const c_num = a*yVal + b*xVal;    // (a/x + b/y) common denom x*y
+        const f_num = d*yVal + e*xVal;
+        const den   = xVal * yVal;
+
+        // 檢查整除 + 非零
+        if(den !== 0 && c_num % den === 0 && f_num % den === 0){
+          cInt = c_num / den;
+          fInt = f_num / den;
+
+          if(cInt !== 0 && fInt !== 0){
+            break;
+          }
+        }
+
+        if(safetyCount > 500){
+          // fallback：簡單保險題 (x,y)=(1,1)
+          xVal = 1;
+          yVal = 1;
+          a = 2; b = 1; d = 1; e = 2;
+          cInt = 3; // 2/1 +1/1 =3
+          fInt = 3; // 1/1 +2/1 =3
+          break;
+        }
+      }
+
+      // 2. 題目顯示成 LaTeX：
+      //    式(1)： a/x + b/y = cInt
+      //    式(2)： d/x + e/y = fInt
+      // 用 $$\frac{a}{x} + \frac{b}{y} = cInt$$ 的形式
+      function latexEquation(A,B,C){
+        // A/x + B/y = C
+        // 注意正負號：\frac{-3}{x} 這樣MathJax會顯示成 -3/x，OK
+        return `$$ \\frac{${A}}{x} + \\frac{${B}}{y} = ${C} $$`;
+      }
+
+      const eq1Latex = latexEquation(a,b,cInt);
+      const eq2Latex = latexEquation(d,e,fInt);
+
+      // 3. 詳解：
+      // 設 U = 1/x, V = 1/y
+      // 式(1) => aU + bV = cInt
+      // 式(2) => dU + eV = fInt
+      // 解聯立，然後 x=1/U, y=1/V。
+      //
+      // 我們用實際整數解 (xVal,yVal) 來填成果，讓學生看到答案漂亮。
+
+      // determinant
+      const det = a*e - b*d;
+      // U = 1/x, V = 1/y
+      // (假設有唯一解，否則用我們原本 xVal,yVal 兜)
+      const Uval = 1 / xVal;
+      const Vval = 1 / yVal;
+
+      const solutionLatex = [
+        `$$\\text{設 }U=\\frac{1}{x},\\;V=\\frac{1}{y}$$`,
+        `$$\\begin{cases}
+        ${a}U + ${b}V = ${cInt} \\\\
+        ${d}U + ${e}V = ${fInt}
+        \\end{cases}$$`,
+        `$$\\text{解得 }U = \\frac{1}{${xVal}},\\;V = \\frac{1}{${yVal}}$$`,
+        `$$x = \\frac{1}{U} = ${xVal},\\quad y = \\frac{1}{V} = ${yVal}$$`,
+        `$$\\boxed{(x,\\;y)=(${xVal},\\;${yVal})}$$`
+      ].join("\n");
+
+      // 4. 畫面更新（用 innerHTML + MathJax.typeset 重新渲染）
+      const eqBox3 = document.getElementById("equationsBox-3");
+      eqBox3.innerHTML = "式(1)：<br/>" + eq1Latex + "<br/>式(2)：<br/>" + eq2Latex;
+
+      const solBox3 = document.getElementById("solutionBox-3");
+      solBox3.innerHTML = solutionLatex;
+      solBox3.style.display = "none";
+      document.getElementById("toggle-icon-3").textContent = "▶";
+
+      document.getElementById("feedback-3").textContent = "";
+      document.getElementById("feedback-3").className = "feedback";
+
+      document.getElementById("ansX-3").value = "";
+      document.getElementById("ansY-3").value = "";
+
+      curX3 = xVal;
+      curY3 = yVal;
+
+      // 重新渲染 LaTeX
+      if(window.MathJax && window.MathJax.typeset){
+        window.MathJax.typeset();
+      }
+    }
+
+    function checkAnswerType3(){
+      const xInput = document.getElementById("ansX-3").value;
+      const yInput = document.getElementById("ansY-3").value;
+      const fb = document.getElementById("feedback-3");
+
+      if(xInput === "" || yInput === ""){
+        fb.textContent = "請先填好 x 和 y 再檢查";
+        fb.className = "feedback wrong";
+        return;
+      }
+
+      const ux = Number(xInput);
+      const uy = Number(yInput);
+
+      if(ux === curX3 && uy === curY3){
+        fb.textContent = `✅ 正確！(x, y) = (${curX3}, ${curY3})`;
+        fb.className = "feedback correct";
+      } else {
+        fb.textContent = "❌ 還沒對喔，請再試一次";
+        fb.className = "feedback wrong";
+      }
+    }
+
+    // ===========================
     // 詳解展開/收合
     // ===========================
     document.getElementById("toggle-solution-1").addEventListener("click", ()=>{
@@ -834,6 +1085,9 @@
         box.style.display = "none";
         icon.textContent = "▶";
       }
+      if(window.MathJax && window.MathJax.typeset){
+        window.MathJax.typeset();
+      }
     });
 
     document.getElementById("toggle-solution-2").addEventListener("click", ()=>{
@@ -845,6 +1099,24 @@
       } else {
         box.style.display = "none";
         icon.textContent = "▶";
+      }
+      if(window.MathJax && window.MathJax.typeset){
+        window.MathJax.typeset();
+      }
+    });
+
+    document.getElementById("toggle-solution-3").addEventListener("click", ()=>{
+      const box = document.getElementById("solutionBox-3");
+      const icon = document.getElementById("toggle-icon-3");
+      if(box.style.display === "none"){
+        box.style.display = "block";
+        icon.textContent = "▼";
+      } else {
+        box.style.display = "none";
+        icon.textContent = "▶";
+      }
+      if(window.MathJax && window.MathJax.typeset){
+        window.MathJax.typeset();
       }
     });
 
@@ -875,9 +1147,24 @@
     });
 
     // ===========================
-    // 預設載入：第一型出題 + main用中尺寸
+    // 綁定按鈕 (第三型)
     // ===========================
-    setFontSize("font-medium");
+    document.getElementById("btn-new-3").addEventListener("click", generateProblemType3);
+    document.getElementById("btn-check-3").addEventListener("click", checkAnswerType3);
+    document.getElementById("btn-clear-3").addEventListener("click", ()=>{
+      document.getElementById("ansX-3").value="";
+      document.getElementById("ansY-3").value="";
+      const fb = document.getElementById("feedback-3");
+      fb.textContent="";
+      fb.className="feedback";
+    });
+
+    // ===========================
+    // 預設載入：
+    // 1. 字體用小尺寸(16pt)
+    // 2. 出第一型的題目
+    // ===========================
+    setFontSize("font-small");
     generateProblemType1();
   </script>
 </body>
